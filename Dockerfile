@@ -1,21 +1,17 @@
 FROM rust:1-alpine3.14
 
+ARG SPF_MILTER_BRANCH=master
+
 RUN apk add --no-cache \
     gcc \
     git \
-    gettext \
     libc-dev \
-    libmilter-dev \
-    openssl-dev \
-    pkgconf \
   && test -d spf-milter \
-    || git clone https://gitlab.com/glts/spf-milter.git \
+    || git clone --single-branch --branch "${SPF_MILTER_BRANCH}" https://gitlab.com/glts/spf-milter.git \
   && cd spf-milter \
   && cargo fetch
 
 WORKDIR /spf-milter
-
-COPY milter.pc /pkgconf/
 
 # Trying to statically link this but it's not working...
 # See https://github.com/rust-lang/rust/issues/39998
@@ -28,34 +24,24 @@ RUN PKG_CONFIG_PATH=/pkgconf cargo build --release
 
 # ---
 
-# FROM scratch
-FROM alpine:3.14
-# RUN apk add --no-cache \
-#   gettext \
-#   gcc \
-#   openssl-dev \
-#   libmilter-dev \
-#   libc-dev
+FROM scratch
+# FROM alpine:3.14
 
-# COPY entrypoint.sh /
-# COPY templates /templates/
+# Copy base config
+COPY ./rootfs/ /
 
-# Copy config
-# May wish to make this dynamic later to be able to quickly whitelist domains.
-# COPY spf-milter.conf /etc/
-
-RUN printf '%s\n' "socket = inet:0.0.0.0:3000" "log_destination = stderr" > /etc/spf-milter.conf
-
-# Copy the compiled binary
+# Copy compiled binary
 COPY --from=0 /spf-milter/target/release/spf-milter /usr/local/bin/
 
-# Copy the shared libraries needed
-# May be able to prune some of glibc.
+# Listens on 3000 by default
+EXPOSE 3000
+
+# Ideally this works with FROM scratch... but doesn't b/c
 #
-# Libs are provided by deps in this order:
-#  - libssl-dev (2)
-#  - libmilter-dev (1)
-#  - libc6-dev (45)
+# > failed to create shim: OCI runtime create failed: runc create failed: unable
+# to start container process: exec: "/bin/sh": stat /bin/sh: no such file or
+# directory: unknown
 #
-# ENTRYPOINT ["./entrypoint.sh"]
+# AHHH I see I needed to unset the default CMD
 ENTRYPOINT ["/usr/local/bin/spf-milter"]
+CMD []
