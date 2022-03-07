@@ -11,7 +11,7 @@ push:
   docker push {{tag}}
 
 run:
-  docker run --init --rm --name {{name}} -it -v cargo:/usr/local/cargo:rw {{tag}}
+  docker run --init --rm --name {{name}} -it {{tag}}
 
 sh:
   docker exec -it {{name}} sh
