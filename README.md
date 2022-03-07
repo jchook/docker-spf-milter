@@ -35,7 +35,6 @@ FROM jchook/spf-milter:latest
 COPY ./spf-milter.conf /etc/
 ```
 
-
 License
 -------
 
