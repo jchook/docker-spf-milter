@@ -4,6 +4,9 @@ name := "spf-milter"
 build:
   docker build -t {{tag}} .
 
+docs:
+  grip
+
 push:
   docker push {{tag}}
 
