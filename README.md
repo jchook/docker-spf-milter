@@ -21,7 +21,6 @@ Quick Start
 docker run --init --rm -p 3000:3000 -t jchook/spf-milter:latest
 ```
 
-
 Configuration
 -------------
 
@@ -45,7 +44,3 @@ FROM jchook/spf-milter:latest
 COPY ./spf-milter.conf /etc/
 ```
 
-License
--------
-
-MIT.
