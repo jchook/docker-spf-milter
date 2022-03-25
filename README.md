@@ -6,6 +6,7 @@ Packages [spf-milter](https://gitlab.com/glts/spf-milter) as a Docker image.
 - FROM scratch
 - Runs as nobody by default
 - Super tiny 7.5MB (only 2MB compressed)
+- Useful backtraces in the event of a crash
 - v0.4.0+
 
 Related links:
